@@ -465,6 +465,17 @@ turboR("Turbo R", string() << "input." << configName << ".turboR") {
 
 //
 
+int16_t DataModem::status(unsigned index, unsigned id) const {
+	return 0;
+}
+
+DataModem::DataModem(unsigned category, const char *label, const char *configName) :
+InputGroup(category, label) {
+	// ?
+}
+
+//
+
 Gamepad gamepad1(InputCategory::Port1, "Gamepad", "gamepad1");
 Asciipad asciipad1(InputCategory::Port1, "asciiPad", "asciipad1");
 Gamepad multitap1a(InputCategory::Port1, "Multitap - Port 1", "multitap1a");
@@ -487,6 +498,7 @@ SuperScope superscope(InputCategory::Port2, "Super Scope", "superscope");
 Justifier justifier1(InputCategory::Port2, "Justifier 1", "justifier1");
 Justifier justifier2(InputCategory::Port2, "Justifier 2", "justifier2");
 Justifiers justifiers(justifier1, justifier2);
+DataModem datamodem(InputCategory::Port2, "NTT Data Modem", "datamodem");
 
 
 }

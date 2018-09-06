@@ -9,6 +9,7 @@ public:
     Justifier,
     Justifiers,
     NTTDataKeypad,
+	DataModem,
   };
 
   enum class JoypadID : unsigned {

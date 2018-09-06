@@ -1,5 +1,5 @@
 struct ControllerPort1 { enum { None, Gamepad, Asciipad, Multitap, Mouse, NTTDataKeypad }; };
-struct ControllerPort2 { enum { None, Gamepad, Asciipad, Multitap, Mouse, SuperScope, Justifier, Justifiers }; };
+struct ControllerPort2 { enum { None, Gamepad, Asciipad, Multitap, Mouse, SuperScope, Justifier, Justifiers, DataModem }; };
 
 namespace Controllers {
 
@@ -69,6 +69,11 @@ struct NTTDataKeypad : InputGroup {
   NTTDataKeypad(unsigned, const char*, const char*);
 };
 
+struct DataModem : InputGroup {
+  int16_t status(unsigned, unsigned) const;
+  DataModem(unsigned, const char*, const char*);
+};
+
 struct Mouse : InputGroup {
   AnalogInput x, y;
   DigitalInput left, right;
@@ -119,5 +124,6 @@ extern SuperScope superscope;
 extern Justifier justifier1;
 extern Justifier justifier2;
 extern Justifiers justifiers;
+extern DataModem datamodem;
 
 }

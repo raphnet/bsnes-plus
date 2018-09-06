@@ -230,6 +230,21 @@ uint8 Input::port_read(bool portnumber) {
       }
     } //case Device::NTTDataKeypad
 
+    case Device::DataModem: {
+      if(cpu.joylatch() == 0) {
+        if(p.counter0 >= 32) return 1;
+
+		switch (p.counter0++) {
+			case 12: return 0;
+			case 13: return 0;
+			case 14: return 1;
+			case 15: return 1;
+			default: return 0;
+		}
+      } else {
+        return system.interface->input_poll(portnumber, p.device, 0, 0);
+      }
+	}
 
   } //switch(p.device)
 

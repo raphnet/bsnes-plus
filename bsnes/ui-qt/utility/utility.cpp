@@ -131,6 +131,7 @@ void Utility::updateControllers() {
     case ControllerPort2::SuperScope: mapper().port2 = &Controllers::superscope; break;
     case ControllerPort2::Justifier: mapper().port2 = &Controllers::justifier1; break;
     case ControllerPort2::Justifiers: mapper().port2 = &Controllers::justifiers; break;
+    case ControllerPort2::DataModem: mapper().port2 = &Controllers::datamodem; break;
   }
 
   unacquireMouse();

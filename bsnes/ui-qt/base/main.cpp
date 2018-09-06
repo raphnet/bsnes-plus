@@ -59,6 +59,7 @@ MainWindow::MainWindow() {
   system_port2->addAction(system_port2_superscope = new RadioAction("&Super Scope", 0));
   system_port2->addAction(system_port2_justifier = new RadioAction("&Justifier", 0));
   system_port2->addAction(system_port2_justifiers = new RadioAction("Two &Justifiers", 0));
+  system_port2->addAction(system_port2_data_modem = new RadioAction("Data Modem", 0));
 
   #if !defined(PLATFORM_OSX)
   system->addSeparator();
@@ -278,6 +279,7 @@ MainWindow::MainWindow() {
   connect(system_port2_superscope, SIGNAL(triggered()), this, SLOT(setPort2SuperScope()));
   connect(system_port2_justifier, SIGNAL(triggered()), this, SLOT(setPort2Justifier()));
   connect(system_port2_justifiers, SIGNAL(triggered()), this, SLOT(setPort2Justifiers()));
+  connect(system_port2_data_modem, SIGNAL(triggered()), this, SLOT(setPort2DataModem()));
   connect(system_exit, SIGNAL(triggered()), this, SLOT(quit()));
   connect(settings_videoMode_1x, SIGNAL(triggered()), this, SLOT(setVideoMode1x()));
   connect(settings_videoMode_2x, SIGNAL(triggered()), this, SLOT(setVideoMode2x()));
@@ -347,6 +349,7 @@ void MainWindow::syncUi() {
   system_port2_superscope->setChecked(config().input.port2 == ControllerPort2::SuperScope);
   system_port2_justifier->setChecked (config().input.port2 == ControllerPort2::Justifier);
   system_port2_justifiers->setChecked(config().input.port2 == ControllerPort2::Justifiers);
+  system_port2_data_modem->setChecked(config().input.port2 == ControllerPort2::DataModem);
 
   settings_videoMode_1x->setChecked        (config().video.context->multiplier == 1);
   settings_videoMode_2x->setChecked        (config().video.context->multiplier == 2);
@@ -523,6 +526,12 @@ void MainWindow::setPort2Justifier() {
 void MainWindow::setPort2Justifiers() {
   config().input.port2 = ControllerPort2::Justifiers;
   SNES::config.controller_port2 = SNES::Input::Device::Justifiers;
+  utility.updateControllers();
+}
+
+void MainWindow::setPort2DataModem() {
+  config().input.port2 = ControllerPort2::DataModem;
+  SNES::config.controller_port2 = SNES::Input::Device::DataModem;
   utility.updateControllers();
 }
 
