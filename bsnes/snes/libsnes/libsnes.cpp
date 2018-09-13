@@ -221,6 +221,8 @@ uint8_t* snes_get_memory_data(unsigned id) {
       if(SNES::cartridge.mode() != SNES::Cartridge::Mode::SuperGameBoy) break;
       SNES::supergameboy.save();
       return SNES::memory::gbrtc.data();
+    case SNES_MEMORY_CARTRIDGE_FLASH:
+	  return SNES::memory::cartflash.data();
   }
 
   return 0;
@@ -261,6 +263,9 @@ unsigned snes_get_memory_size(unsigned id) {
       if(SNES::cartridge.mode() != SNES::Cartridge::Mode::SuperGameBoy) break;
       size = SNES::memory::gbrtc.size();
       break;
+	case SNES_MEMORY_CARTRIDGE_FLASH:
+	  size = SNES::memory::cartflash.size();
+	  break;
   }
 
   return size;

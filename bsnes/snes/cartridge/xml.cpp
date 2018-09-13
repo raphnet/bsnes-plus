@@ -48,6 +48,7 @@ void Cartridge::parse_xml_cartridge(const char *data) {
         if(node.name == "setarisc") xml_parse_setarisc(node);
         if(node.name == "msu1") xml_parse_msu1(node);
         if(node.name == "serial") xml_parse_serial(node);
+		if(node.name == "amdflash") xml_parse_amdflash(node);
       }
     }
   }
@@ -373,6 +374,22 @@ void Cartridge::xml_parse_srtc(xml_element &root) {
       mapping.append(m);
     }
   }
+}
+
+void Cartridge::xml_parse_amdflash(xml_element &root) {
+  has_amdflash = true;
+  foreach(node, root.element) {
+    if(node.name == "map") {
+      Mapping m(amdflash);
+      foreach(attr, node.attribute) {
+        if(attr.name == "address") xml_parse_address(m, attr.content);
+      }
+      mapping.append(m);
+    }
+  }
+
+
+//  xml_parse_memory(root, memory::cartflash);
 }
 
 void Cartridge::xml_parse_sdd1(xml_element &root) {

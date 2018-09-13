@@ -15,6 +15,7 @@ namespace memory {
   MappedRAM stArom, stAram;
   MappedRAM stBrom, stBram;
   MappedRAM gbrom, gbram, gbrtc;
+  MappedRAM cartflash;
 };
 
 Cartridge cartridge;
@@ -28,11 +29,13 @@ int Cartridge::rom_offset(unsigned addr) const {
       page.access == &memory::vsprom) {
     return page.offset + addr;
   }
-  
+
   return -1;
 }
 
 void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
+printf("Hello!\n");
+
   mode = cartridge_mode;
   region = Region::NTSC;
   ram_size = 0;
@@ -57,6 +60,7 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
   has_st0018     = false;
   has_msu1       = false;
   has_serial     = false;
+  has_amdflash   = false;
 
   parse_xml(xml_list);
 //print(xml_list[0], "\n\n");
@@ -73,6 +77,10 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
 
   if(ram_size > 0) {
     memory::cartram.map(allocate<uint8_t>(ram_size, 0xff), ram_size);
+  }
+
+  if(has_amdflash) {
+    memory::cartflash.map(allocate<uint8_t>(1024*128, 0xff), 1024*128);
   }
 
   if(has_srtc || has_spc7110rtc) {
@@ -98,6 +106,7 @@ void Cartridge::load(Mode cartridge_mode, const lstring &xml_list) {
   memory::cartrom.write_protect(true);
   memory::cartram.write_protect(false);
   memory::cartrtc.write_protect(false);
+  memory::cartflash.write_protect(false); // should be true?
   memory::bsxpack.write_protect(true);
   memory::bsxpram.write_protect(false);
   memory::stArom.write_protect(true);
@@ -135,6 +144,7 @@ void Cartridge::unload() {
   memory::cartrom.reset();
   memory::cartram.reset();
   memory::cartrtc.reset();
+  memory::cartflash.reset();
   memory::bsxpack.reset();
   memory::bsxpram.reset();
   memory::stArom.reset();

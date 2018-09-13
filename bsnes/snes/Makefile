@@ -7,6 +7,7 @@ snes_objects += snes-supergameboy snes-superfx snes-sa1 snes-necdsp
 snes_objects += snes-bsx snes-srtc snes-sdd1 snes-spc7110 snes-cx4
 snes_objects += snes-obc1 snes-st0018
 snes_objects += snes-msu1 snes-serial
+snes_objects += snes-amdflash
 objects += $(snes_objects)
 
 ifeq ($(profile),accuracy)
@@ -62,6 +63,7 @@ obj/snes-obc1.o        : $(snes)/chip/obc1/obc1.cpp $(snes)/chip/obc1/*
 obj/snes-st0018.o      : $(snes)/chip/st0018/st0018.cpp $(snes)/chip/st0018/*
 obj/snes-msu1.o        : $(snes)/chip/msu1/msu1.cpp $(snes)/chip/msu1/*
 obj/snes-serial.o      : $(snes)/chip/serial/serial.cpp $(snes)/chip/serial/*
+obj/snes-amdflash.o    : $(snes)/chip/amdflash/amdflash.cpp $(snes)/chip/amdflash/*
 
 ###########
 # library #

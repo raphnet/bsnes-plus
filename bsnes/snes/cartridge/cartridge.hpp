@@ -56,6 +56,7 @@ public:
   readonly<bool> has_st0018;
   readonly<bool> has_msu1;
   readonly<bool> has_serial;
+  readonly<bool> has_amdflash;
 
   struct Mapping {
     Memory *memory;
@@ -110,13 +111,14 @@ private:
   void xml_parse_setarisc(xml_element&);
   void xml_parse_msu1(xml_element&);
   void xml_parse_serial(xml_element&);
+  void xml_parse_amdflash(xml_element&);
 
   void xml_parse_address(Mapping&, const string&);
   void xml_parse_mode(Mapping&, const string&);
 };
 
 namespace memory {
-  extern MappedRAM cartrom, cartram, cartrtc;
+  extern MappedRAM cartrom, cartram, cartrtc, cartflash;
   extern MappedRAM bsxpack, bsxpram;
   extern MappedRAM stArom, stAram;
   extern MappedRAM stBrom, stBram;

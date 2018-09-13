@@ -108,6 +108,7 @@ bool Cartridge::loadNormal(const char *base) {
 
   loadMemory(baseName, ".srm", SNES::memory::cartram);
   loadMemory(baseName, ".rtc", SNES::memory::cartrtc);
+  loadMemory(baseName, ".flh", SNES::memory::cartflash);
 
   fileName = baseName;
   name = notdir(nall::basename(baseName));
@@ -292,6 +293,7 @@ void Cartridge::saveMemory() {
     case SNES::Cartridge::Mode::BsxSlotted: {
       saveMemory(baseName, ".srm", SNES::memory::cartram);
       saveMemory(baseName, ".rtc", SNES::memory::cartrtc);
+      saveMemory(baseName, ".flh", SNES::memory::cartflash);
     } break;
 
     case SNES::Cartridge::Mode::Bsx: {
@@ -482,6 +484,9 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
   audio.clear();
   if(reader.load(filename, data, size) == false) return false;
 
+print(filename);
+
+
   patchApplied = "";
 
   string bpsName(filepath(nall::basename(filename), config().path.patch), ".bps");
@@ -504,8 +509,10 @@ bool Cartridge::loadCartridge(string &filename, string &xml, SNES::MappedRAM &me
   name = string(nall::basename(filename), ".xml");
   if(patchApplied == "" && file::exists(name)) {
     //prefer manually created XML cartridge mapping
+	printf("Hey!");
     xml.readfile(name);
   } else {
+	printf("Ho!");
     //generate XML mapping from data via heuristics
     xml = SNESCartridge(data, size).xmlMemoryMap;
   }

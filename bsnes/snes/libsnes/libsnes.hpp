@@ -59,6 +59,7 @@ extern "C" {
 #define SNES_MEMORY_SUFAMI_TURBO_B_RAM  5
 #define SNES_MEMORY_GAME_BOY_RAM        6
 #define SNES_MEMORY_GAME_BOY_RTC        7
+#define SNES_MEMORY_CARTRIDGE_FLASH     8
 
 typedef void (*snes_video_refresh_t)(const uint16_t *data, unsigned width, unsigned height);
 typedef void (*snes_audio_sample_t)(uint16_t left, uint16_t right);

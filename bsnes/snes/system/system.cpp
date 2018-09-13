@@ -84,6 +84,7 @@ void System::init(Interface *interface_) {
   st0018.init();
   msu1.init();
   serial.init();
+  amdflash.init();
 
   video.init();
   audio.init();
@@ -133,6 +134,7 @@ void System::power() {
   if(cartridge.has_st0018()) st0018.enable();
   if(cartridge.has_msu1()) msu1.enable();
   if(cartridge.has_serial()) serial.enable();
+  if(cartridge.has_amdflash()) amdflash.enable();
 
   cpu.power();
   smp.power();
@@ -157,6 +159,7 @@ void System::power() {
   if(cartridge.has_st0018()) st0018.power();
   if(cartridge.has_msu1()) msu1.power();
   if(cartridge.has_serial()) serial.power();
+  if(cartridge.has_amdflash()) amdflash.power();
 
   if(expansion == ExpansionPortDevice::BSX) cpu.coprocessors.append(&bsxbase);
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) cpu.coprocessors.append(&supergameboy);
@@ -198,6 +201,7 @@ void System::reset() {
   if(cartridge.has_st0018()) st0018.reset();
   if(cartridge.has_msu1()) msu1.reset();
   if(cartridge.has_serial()) serial.reset();
+  if(cartridge.has_amdflash()) amdflash.reset();
 
   if(expansion == ExpansionPortDevice::BSX) cpu.coprocessors.append(&bsxbase);
   if(cartridge.mode() == Cartridge::Mode::SuperGameBoy) cpu.coprocessors.append(&supergameboy);

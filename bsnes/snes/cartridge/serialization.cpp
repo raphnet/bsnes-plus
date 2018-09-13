@@ -28,6 +28,10 @@ void Cartridge::serialize(serializer &s) {
   if(memory::gbrtc.size() != 0) {
     s.array(memory::gbrtc.data(), memory::gbrtc.size());
   }
+
+  if(memory::cartflash.size() != 0) {
+    s.array(memory::cartflash.data(), memory::cartflash.size());
+  }
 }
 
 #endif
