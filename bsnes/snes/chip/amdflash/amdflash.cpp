@@ -28,18 +28,20 @@ void AmdFlash::reset() {
 
 uint8 AmdFlash::read(unsigned addr)
 {
+  addr &= 0x1FFFF;
+
   switch (flash_state)
   {
 	  default:
 	    flash_state = StateNormal;
 	  case StateNormal:
-	  	return memory::cartflash.read(addr&0x1FFFF);
+	  	return memory::cartflash.read(addr);
 
 	  case StateId:
-	  	if (addr == 0xC00000) {
+	  	if (addr == 0x0000) {
 			return 0x01; // manufacturer
 		}
-		if (addr == 0xC00001) {
+		if (addr == 0x0001) {
 			return 0x20;
 		}
 		return 0xff; // not sure
@@ -51,6 +53,11 @@ uint8 AmdFlash::read(unsigned addr)
 	  case StateEraseSector:
 		flash_state = StateNormal;
 		return 0x80; // instantaneous!
+
+      case StateWriteByte:
+        // Again, no attempt to provide realistic timing.
+		flash_state = StateNormal;
+        return (dta & 0x80);
   }
 
 }
@@ -58,22 +65,24 @@ uint8 AmdFlash::read(unsigned addr)
 void AmdFlash::write(unsigned addr, uint8 data)
 {
   int i;
+  addr &= 0x1FFFF;
 
   if (flash_state == StateWriteByte) {
-    memory::cartflash.write(addr&0x1FFFF, data);
+    dta = data;
+    memory::cartflash.write(addr, data);
 	flash_state = StateNormal;
 	return;
   }
 
   if (step == 1) {
-	if ((addr == 0xC02AAA) && (data == 0x55)) {
+	if ((addr == 0x2AAA) && (data == 0x55)) {
       step++;
 	  return;
 	}
     else
       step = 0;
   }
-  if ((step == 0) && (addr == 0xC05555) && (data == 0xAA)) {
+  if ((step == 0) && (addr == 0x5555) && (data == 0xAA)) {
     step++;
 	return;
   };
@@ -91,7 +100,7 @@ void AmdFlash::write(unsigned addr, uint8 data)
       break;
 
     case 0x90: // enter ID mode
-      if (addr != 0xC05555) {
+      if (addr != 0x5555) {
         break;
       }
       flash_state = StateId;
@@ -102,14 +111,14 @@ void AmdFlash::write(unsigned addr, uint8 data)
       break;
 
     case 0x80: // prepare erase (unlock?)
-      if (addr != 0xC05555) { step = 0; break; }
+      if (addr != 0x5555) { step = 0; break; }
       flash_state = StatePrepareErase;
 	  break;
 
      case 0x10: // erase all
-       if (addr != 0xC05555) { step = 0; break; }
+       if (addr != 0x5555) { step = 0; break; }
 	   for (i=0; i<0x20000; i++)
-         memory::cartflash.write((addr&0x1FFFF)+i, 0xFF);
+         memory::cartflash.write(addr+i, 0xFF);
        flash_state = StateEraseAll;
        break;
 
@@ -120,7 +129,7 @@ void AmdFlash::write(unsigned addr, uint8 data)
 	   break;
 
      case 0xA0: // write byte
-       if (addr != 0xC05555) { step = 0; break; }
+       if (addr != 0x5555) { step = 0; break; }
 	   flash_state = StateWriteByte;
 	   break;
   }

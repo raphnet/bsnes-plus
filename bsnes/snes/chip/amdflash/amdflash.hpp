@@ -15,6 +15,7 @@ private:
   enum FlashState { StateNormal, StateId, StatePrepareErase, StateEraseAll, StateEraseSector, StateWriteByte };
   unsigned flash_state;
   unsigned step;
+  uint8 dta;
 /*  static const unsigned months[12];
   enum RtcMode { RtcReady, RtcCommand, RtcRead, RtcWrite };
   unsigned rtc_mode;
