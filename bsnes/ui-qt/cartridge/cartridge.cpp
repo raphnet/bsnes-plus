@@ -509,10 +509,8 @@ print(filename);
   name = string(nall::basename(filename), ".xml");
   if(patchApplied == "" && file::exists(name)) {
     //prefer manually created XML cartridge mapping
-	printf("Hey!");
     xml.readfile(name);
   } else {
-	printf("Ho!");
     //generate XML mapping from data via heuristics
     xml = SNESCartridge(data, size).xmlMemoryMap;
   }

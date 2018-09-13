@@ -69,8 +69,6 @@ void Application::locateFile(string &filename, bool createDataDirectory) {
 }
 
 void Application::loadCartridge(const string &filename) {
-	print(filename);
-
     if(striend(filename, ".bs")) {
       if(config().path.bsx == "") {
         loaderWindow->loadBsxCartridge("", filename);
