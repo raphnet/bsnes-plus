@@ -7,7 +7,7 @@ snes_objects += snes-supergameboy snes-superfx snes-sa1 snes-necdsp
 snes_objects += snes-bsx snes-srtc snes-sdd1 snes-spc7110 snes-cx4
 snes_objects += snes-obc1 snes-st0018
 snes_objects += snes-msu1 snes-serial
-snes_objects += snes-amdflash
+snes_objects += snes-amdflash snes-modem
 objects += $(snes_objects)
 
 ifeq ($(profile),accuracy)
@@ -49,6 +49,7 @@ obj/snes-dsp.o      : $(snesdsp)/dsp.cpp $(call rwildcard,$(snesdsp)/) $(call rw
 obj/snes-ppu.o      : $(snesppu)/ppu.cpp $(call rwildcard,$(snesppu)/) $(call rwildcard,$(snes)/debugger)
 obj/snes-cartridge.o: $(snes)/cartridge/cartridge.cpp $(call rwilddcard,$(snes)/cartridge/)
 obj/snes-cheat.o    : $(snes)/cheat/cheat.cpp $(call rwildcard,$(snes)/cheat/)
+obj/snes-modem.o    : $(snes)/modem/modem.cpp $(call rwildcard,$(snes)/modem/)
 
 obj/snes-supergameboy.o: $(snes)/chip/supergameboy/supergameboy.cpp $(call rwildcard,$(snes)/chip/supergameboy/)
 obj/snes-superfx.o     : $(snes)/chip/superfx/superfx.cpp $(call rwildcard,$(snes)/chip/superfx/) $(call rwildcard,$(snes)/debugger)

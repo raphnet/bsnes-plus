@@ -96,6 +96,16 @@ private:
       bool trigger1, trigger2;
       bool start1, start2;
     } justifier;
+
+	struct datamodem_t {
+	  Modem modem;
+      // tx = sfc -> modem
+	  // rx = modem -> sfc
+      bool tx_data_present;
+	  uint8_t tx_data_byte;
+	  bool rx_data_present;
+	  uint8_t rx_data_byte;
+	} datamodem;
   } port[2];
 
   friend class System;

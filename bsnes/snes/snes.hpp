@@ -133,6 +133,7 @@ namespace SNES {
   #include "profile-performance.hpp"
   #endif
 
+  #include <modem/modem.hpp>
   #include <system/system.hpp>
   #include <chip/chip.hpp>
   #include <cartridge/cartridge.hpp>

@@ -232,9 +232,79 @@ uint8 Input::port_read(bool portnumber) {
 
     case Device::DataModem: {
       if(cpu.joylatch() == 0) {
-        if(p.counter0 >= 32) return 1;
+        if(p.counter0 >= 16) return 1;
 
-		switch (p.counter0++) {
+		unsigned b = 0;
+		unsigned cycle = p.counter0;
+		p.counter0++;
+
+		switch (cycle) {
+			case 0:
+			case 1:
+			case 2:
+			case 3:
+			case 4:
+			case 5:
+			case 6:
+			case 7:
+			case 8:
+
+				// Modem -> SFC : Status
+				if (cycle == 0) {
+					// if the modem buffer is full, signal not to send.
+					if (!p.datamodem.modem.canWrite()) {
+						b |= 0x02;
+					}
+				} else if (cycle == 1) {
+					// error bit (no error)
+					b |= 0x02;
+				} else if (cycle == 3) {
+					b |= 0x00;
+				} else if (cycle == 4) {
+					b |= 0x00;
+				}
+
+				// SFC -> Modem
+			    if (cycle == 0) {
+					p.datamodem.tx_data_byte = 0;
+
+					// low = yes
+					p.datamodem.tx_data_present = (cpu.pio() & 0x80) == 0;
+
+					if (p.datamodem.modem.hasData()) {
+						p.datamodem.rx_data_present = true;
+						p.datamodem.rx_data_byte = p.datamodem.modem.readData();
+					} else {
+						p.datamodem.rx_data_present = false;
+						p.datamodem.rx_data_byte = 0xff;
+					}
+				}
+
+				// shift in bytes from the SFC
+				p.datamodem.tx_data_byte <<= 1;
+				if (cpu.pio()&0x80) {
+				    p.datamodem.tx_data_byte |= 1;
+				}
+
+				// send complete received bytes to the modem simulator
+				if (cycle == 8) {
+					if (p.datamodem.tx_data_present) {
+						p.datamodem.modem.writeData(p.datamodem.tx_data_byte);
+					}
+				}
+
+				// Modem -> SFC
+				if (cycle == 8) {
+					// low = yes
+					if (p.datamodem.rx_data_present) {
+					  b |= 0x01;
+					}
+				} else {
+					b |= (p.datamodem.rx_data_byte >> 7);
+					p.datamodem.rx_data_byte <<= 1;
+				}
+				return b;
+
 			case 12: return 0;
 			case 13: return 0;
 			case 14: return 1;
