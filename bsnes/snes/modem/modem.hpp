@@ -7,6 +7,7 @@ public:
   void writeData(uint8 data);
   bool canWrite(void);
   void hangup(void);
+  bool carrierDetect(void);
 
 private:
   void processCommandBuffer(void);

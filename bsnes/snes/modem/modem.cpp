@@ -25,6 +25,11 @@ void Modem::hangup(void)
 	}
 }
 
+bool Modem::carrierDetect(void)
+{
+	return mode == Connected;
+}
+
 bool Modem::hasData(void)
 {
 	if (answer_delay) {

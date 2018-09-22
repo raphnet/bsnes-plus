@@ -315,6 +315,11 @@ uint8 Input::port_read(bool portnumber) {
 						p.datamodem.next_data_declared = false;
 					}
 				}
+				if (cycle == 6) {
+					if (p.datamodem.modem.carrierDetect()) {
+						b |= 0x02;
+					}
+				}
 
 				return b;
 
