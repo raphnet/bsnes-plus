@@ -6,6 +6,7 @@ public:
   uint8 readData(void);
   void writeData(uint8 data);
   bool canWrite(void);
+  void hangup(void);
 
 private:
   void processCommandBuffer(void);
@@ -15,6 +16,9 @@ private:
   enum ModemState { Command, Connected };
   unsigned mode;
   bool echo_on;
+  int atx;
+  int connection_rate;
+  int socketfd;
 
   unsigned answer_delay;
 

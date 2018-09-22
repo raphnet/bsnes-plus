@@ -234,7 +234,7 @@ uint8 Input::port_read(bool portnumber) {
       if(cpu.joylatch() == 0) {
         if(p.counter0 >= 16) return 1;
 
-		unsigned b = 0;
+		unsigned b = 0x00;
 		unsigned cycle = p.counter0;
 		p.counter0++;
 
@@ -248,61 +248,74 @@ uint8 Input::port_read(bool portnumber) {
 			case 6:
 			case 7:
 			case 8:
+					// SFC -> Modem
+					if (cycle == 0) {
+						p.datamodem.tx_data_byte = 0;
+
+						// low = yes
+						p.datamodem.tx_data_present = (cpu.pio() & 0x80) == 0;
+
+						if (p.datamodem.next_data_declared) {
+							if (p.datamodem.modem.hasData()) {
+								p.datamodem.rx_data_present = true;
+								p.datamodem.rx_data_byte = p.datamodem.modem.readData();
+								//printf("Sending 0x%02x\n", p.datamodem.rx_data_byte);
+							} else {
+								p.datamodem.rx_data_present = false;
+								p.datamodem.rx_data_byte = 0;
+							}
+						} else {
+							p.datamodem.rx_data_present = false;
+							p.datamodem.rx_data_byte = 0;
+						}
+					}
+
+					// shift in bytes from the SFC
+					p.datamodem.tx_data_byte <<= 1;
+					if (cpu.pio()&0x80) {
+						p.datamodem.tx_data_byte |= 1;
+					}
+
+					// send complete received bytes to the modem simulator
+					if (cycle == 8) {
+						if (p.datamodem.tx_data_present) {
+							p.datamodem.modem.writeData(p.datamodem.tx_data_byte);
+						}
+						else {
+							if (p.datamodem.tx_data_byte == 0x43) {
+								p.datamodem.modem.hangup();
+							} else if (p.datamodem.tx_data_byte != 0xFF) {
+								printf("??: 0x%02x\n", p.datamodem.tx_data_byte);
+							}
+						}
+					}
+
+					// Modem -> SFC
+					if (cycle == 8) {
+						// low = yes
+						if (p.datamodem.rx_data_present) {
+						  b |= 0x01;
+						}
+					} else {
+						if (p.datamodem.rx_data_present) {
+							b |= (p.datamodem.rx_data_byte >> 7);
+							p.datamodem.rx_data_byte <<= 1;
+						}
+					}
 
 				// Modem -> SFC : Status
 				if (cycle == 0) {
-					// if the modem buffer is full, signal not to send.
-					if (!p.datamodem.modem.canWrite()) {
-						b |= 0x02;
-					}
-				} else if (cycle == 1) {
-					// error bit (no error)
-					b |= 0x02;
-				} else if (cycle == 3) {
-					b |= 0x00;
-				} else if (cycle == 4) {
-					b |= 0x00;
-				}
-
-				// SFC -> Modem
-			    if (cycle == 0) {
-					p.datamodem.tx_data_byte = 0;
-
-					// low = yes
-					p.datamodem.tx_data_present = (cpu.pio() & 0x80) == 0;
+					// Let the SFC know if the next read would
+					// return data.
 
 					if (p.datamodem.modem.hasData()) {
-						p.datamodem.rx_data_present = true;
-						p.datamodem.rx_data_byte = p.datamodem.modem.readData();
+						b |= 0x02;
+						p.datamodem.next_data_declared = true;
 					} else {
-						p.datamodem.rx_data_present = false;
-						p.datamodem.rx_data_byte = 0xff;
+						p.datamodem.next_data_declared = false;
 					}
 				}
 
-				// shift in bytes from the SFC
-				p.datamodem.tx_data_byte <<= 1;
-				if (cpu.pio()&0x80) {
-				    p.datamodem.tx_data_byte |= 1;
-				}
-
-				// send complete received bytes to the modem simulator
-				if (cycle == 8) {
-					if (p.datamodem.tx_data_present) {
-						p.datamodem.modem.writeData(p.datamodem.tx_data_byte);
-					}
-				}
-
-				// Modem -> SFC
-				if (cycle == 8) {
-					// low = yes
-					if (p.datamodem.rx_data_present) {
-					  b |= 0x01;
-					}
-				} else {
-					b |= (p.datamodem.rx_data_byte >> 7);
-					p.datamodem.rx_data_byte <<= 1;
-				}
 				return b;
 
 			case 12: return 0;
@@ -440,6 +453,14 @@ void Input::port_set_device(bool portnumber, Device device) {
 
 void Input::poll() {
   for(unsigned i = 0; i < 2; i++) {
+
+	if(port[i].device == Device::DataModem) {
+	  // Enter "ID" mode when two consecutive (but not necessarily close)
+	  // latch pulses without clocks in between are seen.
+  //    port[i].datamodem.next_data_declared = port[i].counter0 == 0;
+	}
+
+
     port[i].counter0 = 0;
     port[i].counter1 = 0;
 
@@ -456,6 +477,7 @@ void Input::poll() {
       port[i].mouse.x = min(127, x);
       port[i].mouse.y = min(127, y);
     }
+
   }
 
   port[1].justifier.active = !port[1].justifier.active;

@@ -105,6 +105,7 @@ private:
 	  uint8_t tx_data_byte;
 	  bool rx_data_present;
 	  uint8_t rx_data_byte;
+	  bool next_data_declared;
 	} datamodem;
   } port[2];
 
