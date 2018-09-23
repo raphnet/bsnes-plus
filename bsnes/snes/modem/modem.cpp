@@ -3,6 +3,8 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <fcntl.h>
+#include <errno.h>
 
 #define MODEM_CPP
 namespace SNES {
@@ -32,6 +34,26 @@ bool Modem::carrierDetect(void)
 
 bool Modem::hasData(void)
 {
+	uint8 d;
+	int res;
+
+	if (socketfd != -1) {
+		res = recv(socketfd, &d, 1, 0);
+		if (res < 0) {
+			if ((errno != EAGAIN) && (errno != EWOULDBLOCK)) {
+				perror("recv");
+				close(socketfd);
+				socketfd = -1;
+				mode = Command;
+				answerCommand("\r\nNO CARRIER\r\n");
+				return false;
+			}
+		}
+		else if (res == 1) {
+			addOutByte(d);
+		}
+	}
+
 	if (answer_delay) {
 		answer_delay--;
 		return false;
@@ -196,7 +218,7 @@ void Modem::processCommandBuffer(void)
 	// Dial
 	if (strncmp((char*)lbuf, "ATD", 3)==0) {
 		char connectStr[32];
-		int res;
+		int res, flags;
 		struct sockaddr_in destination;
 
 		memset(&destination, 0, sizeof(struct sockaddr_in));
@@ -214,9 +236,33 @@ void Modem::processCommandBuffer(void)
 		res = connect(socketfd, (struct sockaddr *)&destination, sizeof(struct sockaddr));
 		if (res == -1) {
 			perror("connect");
+			close(socketfd);
+			socketfd = -1;
 			answerCommand("\r\nBUSY\r\n");
 			return;
 		}
+
+
+
+		flags = fcntl(socketfd, F_GETFL, 0);
+		if (flags == -1) {
+			perror("fcntl");
+			close(socketfd);
+			socketfd = -1;
+			answerCommand("\r\nBUSY\r\n");
+			return;
+		}
+
+		flags |= O_NONBLOCK;
+
+		if (fcntl(socketfd, F_SETFL, flags)) {
+			perror("fcntl");
+			close(socketfd);
+			socketfd = -1;
+			answerCommand("\r\nBUSY\r\n");
+			return;
+		}
+
 
 		snprintf(connectStr, 32, "\r\nCONNECT %d\r\n", connection_rate);
 		answerCommand(connectStr);
