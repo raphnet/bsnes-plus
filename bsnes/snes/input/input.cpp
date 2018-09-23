@@ -304,7 +304,7 @@ uint8 Input::port_read(bool portnumber) {
 					}
 
 				// Modem -> SFC : Status
-				if (cycle == 0) {
+				if (cycle == 1) {
 					// Let the SFC know if the next read would
 					// return data.
 
